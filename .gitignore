@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Raw and extracted mail data - never commit borrower/loan correspondence
+data/
+*.pst
+*.eml
+pst_export/
