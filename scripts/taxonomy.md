@@ -7,7 +7,7 @@ duplicating category definitions in code.
 
 | category | definition |
 |---|---|
-| `borrower_decline` | Declining, rejecting, or pushing back on a borrower request (extension, waiver, consent, reserve draw, lease approval, etc.) |
+| `borrower_decline` | Declining, rejecting, or pushing back on a borrower request (extension, waiver, consent, lease approval, etc.) |
 | `borrower_approval` | Approving or granting a borrower request |
 | `ire_recommendation` | A recommendation made to IRE/INCREF on a course of action (e.g. "we recommend approving...", "our recommendation is to decline...") |
 | `ire_news_positive` | Significant good news delivered to IRE (e.g. loan payoff, NOI outperformance, successful lease-up, covenant cure) |
@@ -26,4 +26,11 @@ duplicating category definitions in code.
   quote someone else's decision without added judgment.
 - Calendar invites, out-of-office replies, meeting logistics, and pure
   document-transmittal emails ("attached please find...") are always `none`.
+- Standard reserve/CapEx draw request processing (submitting, approving, or
+  funding a routine draw request under the loan documents) is always `none` -
+  this is standard process and does not carry useful writing-style context.
+  Only classify a draw-related email outside `none` if it reflects a
+  substantive decision beyond routine processing (e.g. declining a draw due
+  to a covenant or documentation issue, which is `borrower_decline` or
+  `covenant_dy_issue` as appropriate).
 - When uncertain, prefer the more specific category over `none`.
