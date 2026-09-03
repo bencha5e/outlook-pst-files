@@ -15,10 +15,30 @@ borrower and loan-level financial detail.
 
 ### 1. Extract the PST
 
-Install `readpst` (from `libpst`):
+Two ways to do this, depending on your environment. Both end with the same
+`data/messages.jsonl` output, so pick whichever matches your machine.
+
+**Option A - Windows, no admin rights (e.g. corporate laptop, no WSL):**
+extract straight from Outlook via COM automation. This uses Outlook itself
+(already installed), so there's nothing to install with elevated
+permissions and no third-party binary to trust.
+
+1. In Outlook: `File > Open & Export > Open Outlook Data File`, and select
+   your `.pst`. Note its exact display name in the folder pane.
+2. `pip install --user pywin32`
+3. Run (from a regular PowerShell prompt, Outlook running):
+   ```
+   python scripts\extract_from_outlook.py --list-stores      # confirm the exact name
+   python scripts\extract_from_outlook.py "<store name>" --out data\messages.jsonl
+   ```
+   This reads the PST's Inbox/Sent Items directly and writes
+   `data/messages.jsonl` in one step - skip straight to Step 3 below.
+
+**Option B - macOS/Linux, or Windows with WSL/admin access:** use `readpst`
+(from `libpst`):
 
 ```
-apt install pst-utils      # Debian/Ubuntu
+apt install pst-utils      # Debian/Ubuntu / WSL
 brew install libpst        # macOS
 ```
 
@@ -29,9 +49,10 @@ readpst -e -o pst_export/ path/to/mailbox.pst
 ```
 
 This produces a directory tree like `pst_export/Inbox/*.eml` and
-`pst_export/Sent Items/*.eml`.
+`pst_export/Sent Items/*.eml`. Continue to Step 2 to parse this into
+`data/messages.jsonl`.
 
-### 2. Parse into structured records
+### 2. Parse into structured records (readpst path only - skip if you used `extract_from_outlook.py`)
 
 ```
 python3 scripts/parse_emails.py pst_export/ --out data/messages.jsonl
@@ -80,9 +101,11 @@ capturing tone, structure, and how you frame good vs. bad news.
 
 ```
 scripts/
-  parse_emails.py       # PST .eml export -> data/messages.jsonl
-  classify_emails.py    # data/messages.jsonl -> data/classified.jsonl
-  summarize_flagged.py  # data/classified.jsonl -> data/flagged_report.md
-  taxonomy.md           # classification categories (source of truth)
-data/                    # gitignored - all extracted/classified mail content
+  extract_from_outlook.py  # Windows, no admin: Outlook COM -> data/messages.jsonl
+  parse_emails.py           # readpst .eml export -> data/messages.jsonl
+  email_cleaning.py         # shared body-cleaning helpers used by both extractors
+  classify_emails.py        # data/messages.jsonl -> data/classified.jsonl
+  summarize_flagged.py      # data/classified.jsonl -> data/flagged_report.md
+  taxonomy.md                # classification categories (source of truth)
+data/                        # gitignored - all extracted/classified mail content
 ```
